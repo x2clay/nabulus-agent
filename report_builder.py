@@ -146,6 +146,11 @@ PROFILES = {
              "identity or role - full authentication bypass and privilege escalation.",
              "Rotate to a long, random, high-entropy signing key stored in a secret manager; "
              "consider asymmetric (RS/ES) signing; pin the accepted alg server-side."),
+    "xxe": ("XML External Entity Injection", "AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+             "The XML parser resolves attacker-defined external entities, enabling server-side file "
+             "disclosure and SSRF from the server's trust position.",
+             "Disable DOCTYPE/external-entity and external-DTD processing in the XML parser "
+             "(FEATURE_SECURE_PROCESSING / disallow-doctype-decl); prefer a hardened parser config."),
 }
 _NUCLEI_SEV_VECTOR = {   # fallback vectors for scanner findings carrying only a severity word
     "critical": "AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H", "high": "AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
