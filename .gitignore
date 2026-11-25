@@ -86,3 +86,7 @@ auth_flow.py
 auth_flow2.py
 auth_flow3.py
 scope_range.json
+nablus_report.json
+sast_raw.json
+band.json
+_nablus_semgrep.json

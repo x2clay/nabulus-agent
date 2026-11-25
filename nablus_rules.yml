@@ -1,0 +1,69 @@
+rules:
+  # ---- SQL injection: formatted query flows into a single-arg execute ----
+  # taint: a string built by %/format/f-string reaching execute($Q) with ONE arg.
+  # single-arg sink deliberately excludes the safe execute(sql, (params,)) shape,
+  # so a parameterized query (the red-herring) does NOT false-positive.
+  - id: nablus-sqli-taint
+    languages: [python]
+    severity: ERROR
+    message: "Formatted SQL string flows into execute() (SQLi sink)."
+    metadata: {class: sqli, confirm: "sqli_harness + sqlmap"}
+    mode: taint
+    pattern-sources:
+      - pattern: '"..." % $X'
+      - pattern: 'f"..."'
+      - pattern: '"...".format(...)'
+    pattern-sinks:
+      - pattern: $C.execute($Q)
+
+  # ---- SQL injection: formatted string passed inline to execute ----
+  - id: nablus-sqli-inline-execute
+    languages: [python]
+    severity: ERROR
+    message: "Formatted SQL string passed directly to execute() (SQLi sink)."
+    metadata: {class: sqli, confirm: "sqli_harness + sqlmap"}
+    patterns:
+      - pattern-either:
+          - pattern: $CONN.execute("..." % $X)
+          - pattern: $CONN.execute(f"...")
+          - pattern: $CONN.execute("...".format(...))
+
+  # ---- OS command injection ----
+  - id: nablus-cmd-injection
+    languages: [python]
+    severity: ERROR
+    message: "User-influenced string reaching a shell/exec sink (command injection)."
+    metadata: {class: cmdi, confirm: "manual / oob"}
+    patterns:
+      - pattern-either:
+          - pattern: os.system(...)
+          - pattern: subprocess.$F(..., shell=True, ...)
+          - pattern: os.popen(...)
+
+  # ---- unsafe deserialization ----
+  - id: nablus-unsafe-deser
+    languages: [python]
+    severity: WARNING
+    message: "Unsafe deserialization of possibly-untrusted data."
+    metadata: {class: deser, confirm: "manual"}
+    patterns:
+      - pattern-either:
+          - pattern: pickle.loads(...)
+          - pattern: yaml.load($X)
+          - pattern: eval(...)
+
+  # ---- SSRF: user-influenced URL into an outbound request ----
+  - id: nablus-ssrf-request
+    languages: [python]
+    severity: WARNING
+    message: "Outbound request to a possibly user-controlled URL (SSRF sink)."
+    metadata: {class: ssrf, confirm: "ssrf_probe + oob"}
+    patterns:
+      - pattern-either:
+          - pattern: requests.$M($URL, ...)
+          - pattern: urllib.request.urlopen($URL, ...)
+          - pattern: urllib.request.urlopen($URL)
+      - metavariable-pattern:
+          metavariable: $URL
+          patterns:
+            - pattern-not: '"..."'
