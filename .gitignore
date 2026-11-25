@@ -90,3 +90,6 @@ nablus_report.json
 sast_raw.json
 band.json
 _nablus_semgrep.json
+baseline_scorecard.json
+candidate_scorecard.json
+*_scorecard.json
