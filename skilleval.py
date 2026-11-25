@@ -32,6 +32,9 @@ CLASS_MAP = {
     "authbypass": "auth-bypass", "auth-bypass": "auth-bypass",
 }
 
+# vuln classes reachable with ZERO credentials (the --anon black-box product scope)
+ANON_CLASSES = {"unauth-exposure", "cors-misconfig", "auth-bypass", "ssrf", "open-redirect"}
+
 
 def report_to_findings(report):
     out = []
@@ -56,16 +59,26 @@ def main():
     ap.add_argument("--run", action="store_true", help="run pipeline.py fresh before scoring")
     ap.add_argument("--source", default=None, help="passed to pipeline --source (optional white-box)")
     ap.add_argument("--out", default=None, help="write the scorecard JSON here")
+    ap.add_argument("--anon", action="store_true",
+                    help="score the zero-creds product: run pipeline --anon + anon-only key")
     a = ap.parse_args()
 
     if a.run:
         argv = [sys.executable, "pipeline.py"]
+        if a.anon:
+            argv.append("--anon")
         if a.source:
             argv += ["--source", a.source]
         subprocess.run(argv, cwd=str(HERE))
 
     report = json.loads((HERE / a.report).read_text(encoding="utf-8"))
-    key = AnswerKey.load(HERE / a.key)
+    key_path = HERE / a.key
+    if a.anon:
+        raw = json.loads((HERE / a.key).read_text(encoding="utf-8"))
+        raw["expected"] = [e for e in raw["expected"] if e.get("vuln_class") in ANON_CLASSES]
+        key_path = HERE / "nablus_range_key_anon.json"
+        key_path.write_text(json.dumps(raw, indent=2), encoding="utf-8")
+    key = AnswerKey.load(key_path)
     findings = report_to_findings(report)
     card = score(key, findings, mode="no_web_search")
 

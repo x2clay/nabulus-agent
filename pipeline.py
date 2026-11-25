@@ -116,16 +116,21 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--source", default=None, help="target source path for the white-box stream")
     ap.add_argument("--skip-blackbox", action="store_true")
+    ap.add_argument("--anon", action="store_true",
+                    help="zero-creds black-box product: anon stages only, skip authed logins")
     ap.add_argument("--out", default="nablus_report.json")
     a = ap.parse_args()
 
     idor = sqli = xss = bac = bizlogic = openredir = unauth = cors = authbypass = ssrf = []
     if not a.skip_blackbox:
-        idor = run_stage("black-box IDOR", ["idor_harness.py"], "idor_findings.json")
-        sqli = run_stage("black-box SQLi", ["sqli_harness.py"], "sqli_findings.json")
-        xss = run_stage("black-box XSS", ["xss_harness.py"], "xss_findings.json")
-        bac = run_stage("black-box broken-access-control", ["bac_harness.py"], "bac_findings.json")
-        bizlogic = run_stage("black-box business-logic", ["bizlogic_harness.py"], "bizlogic_findings.json")
+        if not a.anon:        # authed stages need a login; --anon = zero-creds product
+            idor = run_stage("black-box IDOR", ["idor_harness.py"], "idor_findings.json")
+            sqli = run_stage("black-box SQLi", ["sqli_harness.py"], "sqli_findings.json")
+            xss = run_stage("black-box XSS", ["xss_harness.py"], "xss_findings.json")
+            bac = run_stage("black-box broken-access-control", ["bac_harness.py"], "bac_findings.json")
+            bizlogic = run_stage("black-box business-logic", ["bizlogic_harness.py"], "bizlogic_findings.json")
+        else:
+            print("[pipeline] --anon: anonymous/unauth stages only (zero creds)")
         openredir = run_stage("black-box open-redirect", ["openredirect_harness.py"], "openredirect_findings.json")
         unauth = run_stage("black-box unauth-exposure", ["unauth_exposure_harness.py"], "unauth_findings.json")
         cors = run_stage("black-box cors-misconfig", ["cors_harness.py"], "cors_findings.json")
