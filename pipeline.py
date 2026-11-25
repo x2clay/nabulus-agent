@@ -37,7 +37,7 @@ def run_stage(name, argv, out_file, timeout=1800):
     return []
 
 
-def reconcile(idor, sqli, xss, sast):
+def reconcile(idor, sqli, xss, bac, bizlogic, sast):
     findings = []
     for f in idor:
         if f.get("confirmed"):
@@ -54,6 +54,16 @@ def reconcile(idor, sqli, xss, sast):
             findings.append({"class": "xss", "stream": "black-box", "confirmed": True,
                              "endpoint": f.get("endpoint"), "param": f.get("param"),
                              "detail": f.get("subtype", "reflected")})
+    for f in bac:
+        if f.get("confirmed"):
+            findings.append({"class": "bulk", "stream": "black-box", "confirmed": True,
+                             "endpoint": f.get("endpoint"), "param": None,
+                             "detail": f.get("detail", "bulk sensitive-data disclosure")})
+    for f in bizlogic:
+        if f.get("confirmed"):
+            findings.append({"class": "business-logic", "stream": "black-box", "confirmed": True,
+                             "endpoint": f.get("endpoint"), "param": f.get("param"),
+                             "detail": f.get("detail", "business-logic tamper")})
     for f in sast:
         findings.append({"class": f.get("class"), "stream": "white-box", "confirmed": False,
                          "endpoint": None, "param": ";".join(f.get("param_hints", [])) or None,
@@ -80,11 +90,13 @@ def main():
     ap.add_argument("--out", default="nablus_report.json")
     a = ap.parse_args()
 
-    idor = sqli = xss = []
+    idor = sqli = xss = bac = bizlogic = []
     if not a.skip_blackbox:
         idor = run_stage("black-box IDOR", ["idor_harness.py"], "idor_findings.json")
         sqli = run_stage("black-box SQLi", ["sqli_harness.py"], "sqli_findings.json")
         xss = run_stage("black-box XSS", ["xss_harness.py"], "xss_findings.json")
+        bac = run_stage("black-box broken-access-control", ["bac_harness.py"], "bac_findings.json")
+        bizlogic = run_stage("black-box business-logic", ["bizlogic_harness.py"], "bizlogic_findings.json")
     sast = []
     if a.source:
         sast = run_stage("white-box SAST", ["sast_scan.py", "--source", a.source,
@@ -92,7 +104,7 @@ def main():
     else:
         print("\n[pipeline] no --source given; skipping white-box stream")
 
-    findings = reconcile(idor, sqli, xss, sast)
+    findings = reconcile(idor, sqli, xss, bac, bizlogic, sast)
     (ROOT / a.out).write_text(json.dumps(findings, indent=2), encoding="utf-8")
 
     confirmed = [f for f in findings if f.get("confirmed")]
