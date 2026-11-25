@@ -166,7 +166,7 @@ def main():
     a = ap.parse_args()
 
     if a.recon:
-        recon = run_stage("recon discovery", ["recon_harness.py"], "recon_targets.json")
+        recon = run_stage("recon discovery", ["src/recon_harness.py"], "recon_targets.json")
         seeds = recon.get("seeds", "") if isinstance(recon, dict) else ""
         if seeds:
             existing = os.environ.get("NABLUS_SEEDS", "").strip()
@@ -177,29 +177,29 @@ def main():
     idor = sqli = xss = bac = bizlogic = openredir = unauth = cors = authbypass = ssrf = ssti = lfi = jwt = graphql = nosqli = xxe = nuclei = subtk = []
     if not a.skip_blackbox:
         if not a.anon:        # authed stages need a login; --anon = zero-creds product
-            idor = run_stage("black-box IDOR", ["idor_harness.py"], "idor_findings.json")
-            sqli = run_stage("black-box SQLi", ["sqli_harness.py"], "sqli_findings.json")
-            xss = run_stage("black-box XSS", ["xss_harness.py"], "xss_findings.json")
-            bac = run_stage("black-box broken-access-control", ["bac_harness.py"], "bac_findings.json")
-            bizlogic = run_stage("black-box business-logic", ["bizlogic_harness.py"], "bizlogic_findings.json")
+            idor = run_stage("black-box IDOR", ["src/idor_harness.py"], "idor_findings.json")
+            sqli = run_stage("black-box SQLi", ["src/sqli_harness.py"], "sqli_findings.json")
+            xss = run_stage("black-box XSS", ["src/xss_harness.py"], "xss_findings.json")
+            bac = run_stage("black-box broken-access-control", ["src/bac_harness.py"], "bac_findings.json")
+            bizlogic = run_stage("black-box business-logic", ["src/bizlogic_harness.py"], "bizlogic_findings.json")
         else:
             print("[pipeline] --anon: anonymous/unauth stages only (zero creds)")
-        openredir = run_stage("black-box open-redirect", ["openredirect_harness.py"], "openredirect_findings.json")
-        unauth = run_stage("black-box unauth-exposure", ["unauth_exposure_harness.py"], "unauth_findings.json")
-        cors = run_stage("black-box cors-misconfig", ["cors_harness.py"], "cors_findings.json")
-        authbypass = run_stage("black-box auth-bypass", ["authbypass_harness.py"], "authbypass_findings.json")
-        ssrf = run_stage("black-box SSRF", ["ssrf_harness.py"], "ssrf_findings.json")
-        ssti = run_stage("black-box SSTI", ["ssti_harness.py"], "ssti_findings.json")
-        lfi = run_stage("black-box path-traversal", ["pathtraversal_harness.py"], "pathtraversal_findings.json")
-        jwt = run_stage("black-box JWT weak-key", ["jwt_harness.py"], "jwt_findings.json")
-        graphql = run_stage("black-box GraphQL introspection", ["graphql_harness.py"], "graphql_findings.json")
-        nosqli = run_stage("black-box NoSQLi", ["nosqli_harness.py"], "nosqli_findings.json")
-        xxe = run_stage("black-box XXE (OOB)", ["xxe_harness.py"], "xxe_findings.json")
-        nuclei = run_stage("scanner nuclei (breadth)", ["nuclei_harness.py"], "nuclei_findings.json")
-        subtk = run_stage("subdomain-takeover", ["subtakeover_harness.py"], "subtakeover_findings.json")
+        openredir = run_stage("black-box open-redirect", ["src/openredirect_harness.py"], "openredirect_findings.json")
+        unauth = run_stage("black-box unauth-exposure", ["src/unauth_exposure_harness.py"], "unauth_findings.json")
+        cors = run_stage("black-box cors-misconfig", ["src/cors_harness.py"], "cors_findings.json")
+        authbypass = run_stage("black-box auth-bypass", ["src/authbypass_harness.py"], "authbypass_findings.json")
+        ssrf = run_stage("black-box SSRF", ["src/ssrf_harness.py"], "ssrf_findings.json")
+        ssti = run_stage("black-box SSTI", ["src/ssti_harness.py"], "ssti_findings.json")
+        lfi = run_stage("black-box path-traversal", ["src/pathtraversal_harness.py"], "pathtraversal_findings.json")
+        jwt = run_stage("black-box JWT weak-key", ["src/jwt_harness.py"], "jwt_findings.json")
+        graphql = run_stage("black-box GraphQL introspection", ["src/graphql_harness.py"], "graphql_findings.json")
+        nosqli = run_stage("black-box NoSQLi", ["src/nosqli_harness.py"], "nosqli_findings.json")
+        xxe = run_stage("black-box XXE (OOB)", ["src/xxe_harness.py"], "xxe_findings.json")
+        nuclei = run_stage("scanner nuclei (breadth)", ["src/nuclei_harness.py"], "nuclei_findings.json")
+        subtk = run_stage("subdomain-takeover", ["src/subtakeover_harness.py"], "subtakeover_findings.json")
     sast = []
     if a.source:
-        sast = run_stage("white-box SAST", ["sast_scan.py", "--source", a.source,
+        sast = run_stage("white-box SAST", ["src/sast_scan.py", "--source", a.source,
                                             "--out", "sast_findings.json"], "sast_findings.json")
     else:
         print("\n[pipeline] no --source given; skipping white-box stream")
