@@ -566,10 +566,8 @@ def scan(targets: list, hours: float) -> dict:
     except (TypeError, ValueError):
         hours = 2
     hours = min(8, max(0.5, hours))
-    try:
-        ensure_bench()
-    except Exception as exc:
-        return {"ok": False, "error": f"Bench patch did not apply: {exc}"}
+    if not (ROOT / "pipeline.py").is_file():
+        return {"ok": False, "error": "pipeline.py not found on the scan host."}
     scope = load_scope()
     scope["authorized_assets"] = hosts
     (ROOT / "scope.json").write_text(json.dumps(scope, indent=2), encoding="utf-8")
@@ -577,17 +575,28 @@ def scan(targets: list, hours: float) -> dict:
     (ROOT / "runs").mkdir(exist_ok=True)
     (ROOT / "_run.json").write_text(json.dumps({"runid": runid, "target": hosts[0]}), encoding="utf-8")
     launch = ROOT / "bench-launch.ps1"
+    # The finder is now pipeline.py (our deterministic, zero-FP scanner) instead of autonomous.py
+    # --bench. It runs one-shot against the target, writes nablus_report.json, then
+    # report_to_notebook.py converts that into notebook.json - the SAME file the DeepSeek
+    # extraction reviewer (material/deepseek_talk) and the download already read. Downstream unchanged.
+    target_url = hosts[0] if "://" in hosts[0] else f"https://{hosts[0]}"
+    inner = (
+        'cmd.exe /c cd /d `"$agent`"&& set PYTHONUNBUFFERED=1&& '
+        f'set NABLUS_TARGET={target_url}&& set NABLUS_PACE=0.1&& set NABLUS_NUCLEI_RATE=60&& '
+        'py -3 -u pipeline.py --anon --recon --out nablus_report.json > `"$out`" 2> `"$err`" && '
+        'py -3 -u report_to_notebook.py >> `"$out`" 2>> `"$err`"'
+    )
     launch.write_text(
         "\n".join([
             'param([double]$Hours = 2)',
             '$agent = "C:\\Users\\Laith\\nabulus-agent"',
-            'Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like "*autonomous.py*" } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }',
+            'Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like "*pipeline.py*" } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }',
             "Start-Sleep -Seconds 1",
             '$out = Join-Path $agent "run.out"',
             '$err = Join-Path $agent "run.err"',
             'Set-Content -Path $out -Value "" -Encoding utf8',
             'Set-Content -Path $err -Value "" -Encoding utf8',
-            '$cmd = "cmd.exe /c set PYTHONUNBUFFERED=1&& py -3 -u `"$agent\\autonomous.py`" --bench --hours $Hours > `"$out`" 2> `"$err`""',
+            f'$cmd = "{inner}"',
             '$r = Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ CommandLine = $cmd }',
             'Write-Output $r.ProcessId',
             "",
@@ -613,7 +622,7 @@ def scan(targets: list, hours: float) -> dict:
 
 def stop_scan() -> dict:
     script = (
-        'Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like "*autonomous.py*" } | '
+        'Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like "*pipeline.py*" } | '
         'ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue; $_.ProcessId }'
     )
     done = subprocess.run(
@@ -640,7 +649,7 @@ def read_from(path: Path, offset: int) -> tuple[str, int]:
 def running() -> bool:
     done = subprocess.run(
         ["powershell", "-NoProfile", "-Command",
-         '(Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like "*autonomous.py*" }).ProcessId'],
+         '(Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like "*pipeline.py*" }).ProcessId'],
         capture_output=True,
         text=True,
         timeout=20,
