@@ -41,7 +41,7 @@ def run_stage(name, argv, out_file, timeout=1800):
     return []
 
 
-def reconcile(idor, sqli, xss, bac, bizlogic, openredir, unauth, cors, authbypass, ssrf, sast):
+def reconcile(idor, sqli, xss, bac, bizlogic, openredir, unauth, cors, authbypass, ssrf, nuclei, sast):
     findings = []
     for f in idor:
         if f.get("confirmed"):
@@ -93,6 +93,12 @@ def reconcile(idor, sqli, xss, bac, bizlogic, openredir, unauth, cors, authbypas
             findings.append({"class": "ssrf", "stream": "black-box", "confirmed": True,
                              "endpoint": f.get("endpoint"), "param": f.get("param"),
                              "detail": f.get("validated_by", "out-of-band SSRF callback")})
+    for f in nuclei:
+        if f.get("confirmed"):
+            findings.append({"class": f.get("class"), "stream": "scanner", "confirmed": True,
+                             "endpoint": f.get("endpoint"), "param": f.get("param"),
+                             "severity": f.get("severity"), "template": f.get("template"),
+                             "detail": f.get("proof", "nuclei template match")})
     for f in sast:
         findings.append({"class": f.get("class"), "stream": "white-box", "confirmed": False,
                          "endpoint": None, "param": ";".join(f.get("param_hints", [])) or None,
@@ -121,7 +127,7 @@ def main():
     ap.add_argument("--out", default="nablus_report.json")
     a = ap.parse_args()
 
-    idor = sqli = xss = bac = bizlogic = openredir = unauth = cors = authbypass = ssrf = []
+    idor = sqli = xss = bac = bizlogic = openredir = unauth = cors = authbypass = ssrf = nuclei = []
     if not a.skip_blackbox:
         if not a.anon:        # authed stages need a login; --anon = zero-creds product
             idor = run_stage("black-box IDOR", ["idor_harness.py"], "idor_findings.json")
@@ -136,6 +142,7 @@ def main():
         cors = run_stage("black-box cors-misconfig", ["cors_harness.py"], "cors_findings.json")
         authbypass = run_stage("black-box auth-bypass", ["authbypass_harness.py"], "authbypass_findings.json")
         ssrf = run_stage("black-box SSRF", ["ssrf_harness.py"], "ssrf_findings.json")
+        nuclei = run_stage("scanner nuclei (breadth)", ["nuclei_harness.py"], "nuclei_findings.json")
     sast = []
     if a.source:
         sast = run_stage("white-box SAST", ["sast_scan.py", "--source", a.source,
@@ -143,7 +150,7 @@ def main():
     else:
         print("\n[pipeline] no --source given; skipping white-box stream")
 
-    findings = reconcile(idor, sqli, xss, bac, bizlogic, openredir, unauth, cors, authbypass, ssrf, sast)
+    findings = reconcile(idor, sqli, xss, bac, bizlogic, openredir, unauth, cors, authbypass, ssrf, nuclei, sast)
     (ROOT / a.out).write_text(json.dumps(findings, indent=2), encoding="utf-8")
 
     confirmed = [f for f in findings if f.get("confirmed")]
