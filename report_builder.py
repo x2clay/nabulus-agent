@@ -121,6 +121,31 @@ PROFILES = {
     "misconfig": ("Security Misconfiguration", "AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
              "A misconfiguration weakens the security posture of the asset.",
              "Apply hardening guidance for the affected component."),
+    "ssti": ("Server-Side Template Injection", "AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H",
+             "User input is evaluated by a server-side template engine, typically escalating to "
+             "remote code execution and full server compromise.",
+             "Never render user input as a template; pass it strictly as data/context; sandbox the "
+             "engine and disable dangerous built-ins."),
+    "path-traversal": ("Path Traversal / Local File Inclusion", "AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+             "A file parameter can escape the intended directory and read arbitrary files on the "
+             "server (credentials, source, secrets).",
+             "Resolve and canonicalize the path, then confirm it stays within an allowlisted base "
+             "directory; reject traversal sequences; serve files by opaque id, not raw path."),
+    "nosqli": ("NoSQL Injection", "AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N",
+             "Attacker-controlled query operators reach the datastore, allowing authentication "
+             "bypass and extraction or modification of records.",
+             "Reject object/operator-typed values where scalars are expected; cast inputs; use "
+             "parameterized query builders; enforce a strict schema on request bodies."),
+    "graphql-introspection": ("GraphQL Introspection Exposure", "AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+             "Anonymous callers can read the full GraphQL schema, mapping every type, field, and "
+             "mutation for targeted authorization/IDOR abuse.",
+             "Disable introspection in production; require authentication; apply field-level authz "
+             "and query depth/cost limits."),
+    "auth": ("Weak JWT Signing Key", "AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:N",
+             "The JWT is signed with a guessable secret, so an attacker can forge tokens with any "
+             "identity or role - full authentication bypass and privilege escalation.",
+             "Rotate to a long, random, high-entropy signing key stored in a secret manager; "
+             "consider asymmetric (RS/ES) signing; pin the accepted alg server-side."),
 }
 _NUCLEI_SEV_VECTOR = {   # fallback vectors for scanner findings carrying only a severity word
     "critical": "AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H", "high": "AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",

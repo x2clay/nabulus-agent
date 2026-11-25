@@ -41,7 +41,7 @@ def run_stage(name, argv, out_file, timeout=1800):
     return []
 
 
-def reconcile(idor, sqli, xss, bac, bizlogic, openredir, unauth, cors, authbypass, ssrf, nuclei, subtk, sast):
+def reconcile(idor, sqli, xss, bac, bizlogic, openredir, unauth, cors, authbypass, ssrf, ssti, lfi, jwt, graphql, nosqli, nuclei, subtk, sast):
     findings = []
     for f in idor:
         if f.get("confirmed"):
@@ -93,6 +93,31 @@ def reconcile(idor, sqli, xss, bac, bizlogic, openredir, unauth, cors, authbypas
             findings.append({"class": "ssrf", "stream": "black-box", "confirmed": True,
                              "endpoint": f.get("endpoint"), "param": f.get("param"),
                              "detail": f.get("validated_by", "out-of-band SSRF callback")})
+    for f in ssti:
+        if f.get("confirmed"):
+            findings.append({"class": "ssti", "stream": "black-box", "confirmed": True,
+                             "endpoint": f.get("endpoint"), "param": f.get("param"),
+                             "detail": f.get("validated_by", "server-side template injection")})
+    for f in lfi:
+        if f.get("confirmed"):
+            findings.append({"class": "path-traversal", "stream": "black-box", "confirmed": True,
+                             "endpoint": f.get("endpoint"), "param": f.get("param"),
+                             "detail": f.get("validated_by", "arbitrary file read")})
+    for f in jwt:
+        if f.get("confirmed"):
+            findings.append({"class": "auth", "stream": "black-box", "confirmed": True,
+                             "endpoint": f.get("endpoint"), "param": f.get("param"),
+                             "detail": f.get("validated_by", "weak JWT signing key")})
+    for f in graphql:
+        if f.get("confirmed"):
+            findings.append({"class": "graphql-introspection", "stream": "black-box", "confirmed": True,
+                             "endpoint": f.get("endpoint"), "param": f.get("param"),
+                             "detail": f.get("validated_by", "graphql introspection exposed")})
+    for f in nosqli:
+        if f.get("confirmed"):
+            findings.append({"class": "nosqli", "stream": "black-box", "confirmed": True,
+                             "endpoint": f.get("endpoint"), "param": f.get("param"),
+                             "detail": f.get("validated_by", "nosql operator injection")})
     for f in nuclei:
         if f.get("confirmed"):
             findings.append({"class": f.get("class"), "stream": "scanner", "confirmed": True,
@@ -144,7 +169,7 @@ def main():
             print(f"[pipeline] recon widened NABLUS_SEEDS to {len(os.environ['NABLUS_SEEDS'].split(','))} path(s)")
         else:
             print("[pipeline] recon produced no seeds; stages run on NABLUS_TARGET only")
-    idor = sqli = xss = bac = bizlogic = openredir = unauth = cors = authbypass = ssrf = nuclei = subtk = []
+    idor = sqli = xss = bac = bizlogic = openredir = unauth = cors = authbypass = ssrf = ssti = lfi = jwt = graphql = nosqli = nuclei = subtk = []
     if not a.skip_blackbox:
         if not a.anon:        # authed stages need a login; --anon = zero-creds product
             idor = run_stage("black-box IDOR", ["idor_harness.py"], "idor_findings.json")
@@ -159,6 +184,11 @@ def main():
         cors = run_stage("black-box cors-misconfig", ["cors_harness.py"], "cors_findings.json")
         authbypass = run_stage("black-box auth-bypass", ["authbypass_harness.py"], "authbypass_findings.json")
         ssrf = run_stage("black-box SSRF", ["ssrf_harness.py"], "ssrf_findings.json")
+        ssti = run_stage("black-box SSTI", ["ssti_harness.py"], "ssti_findings.json")
+        lfi = run_stage("black-box path-traversal", ["pathtraversal_harness.py"], "pathtraversal_findings.json")
+        jwt = run_stage("black-box JWT weak-key", ["jwt_harness.py"], "jwt_findings.json")
+        graphql = run_stage("black-box GraphQL introspection", ["graphql_harness.py"], "graphql_findings.json")
+        nosqli = run_stage("black-box NoSQLi", ["nosqli_harness.py"], "nosqli_findings.json")
         nuclei = run_stage("scanner nuclei (breadth)", ["nuclei_harness.py"], "nuclei_findings.json")
         subtk = run_stage("subdomain-takeover", ["subtakeover_harness.py"], "subtakeover_findings.json")
     sast = []
@@ -168,7 +198,7 @@ def main():
     else:
         print("\n[pipeline] no --source given; skipping white-box stream")
 
-    findings = reconcile(idor, sqli, xss, bac, bizlogic, openredir, unauth, cors, authbypass, ssrf, nuclei, subtk, sast)
+    findings = reconcile(idor, sqli, xss, bac, bizlogic, openredir, unauth, cors, authbypass, ssrf, ssti, lfi, jwt, graphql, nosqli, nuclei, subtk, sast)
     (ROOT / a.out).write_text(json.dumps(findings, indent=2), encoding="utf-8")
 
     confirmed = [f for f in findings if f.get("confirmed")]
