@@ -93,3 +93,12 @@ _nablus_semgrep.json
 baseline_scorecard.json
 candidate_scorecard.json
 *_scorecard.json
+
+# ---- run artifacts / bundles / target-specific one-offs (git add -A guard) ----
+*.bundle
+scope_quantnq.json
+run_quantnq_scoped.ps1
+stage*.json
+*_status_test.json
+# keep: the anon answer key IS an engine fixture (skilleval --anon reads it)
+!nablus_range_key_anon.json

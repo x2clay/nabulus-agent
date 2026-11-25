@@ -83,3 +83,26 @@ docs/        architecture + runbooks
 Authorized testing only. Scope-gated, detection-only by default (no table dumps, no
 `--os-shell`, no state-changing writes without an explicit human gate). Egress is the
 box's VPN exit; allowlist it with the client on real engagements. See ARCHITECTURE.
+
+## Repository layout
+
+```
+pipeline.py            Canonical coordinated scan - runs every detector stage as a subprocess,
+                       then reconciles black-box PoCs + white-box SAST into one report.
+skilleval.py           Scores a pipeline run against the range answer key (precision/recall).
+report_builder.py      Additive, read-only: CVSS v3.1 + submittable report from the reconciled output.
+
+Black-box detectors (each self-contained, confirm-oracle = deterministic repro or it is only a lead):
+  idor_ sqli_ xss_ bac_ bizlogic_ openredirect_ unauth_exposure_ cors_ authbypass_ ssrf_
+  ssti_ pathtraversal_ jwt_ graphql_ nosqli_ xxe_   (*_harness.py)
+Breadth / recon:  nuclei_harness.py  recon_harness.py  subtakeover_harness.py
+White-box:        sast_scan.py
+DeepSeek flow (opt-in, LLM): autonomous.py  ship_proof.py  extractor.py  (+ battery/confirm/playbook/probes/surface/session)
+Shared:           runner.py (scope gate)  oob.py (interactsh OOB)  report_builder.py
+
+engine/      Scope-gated concurrency + contracts framework (coordinator/worker/policy/http) + bench/.
+gateway/     Tailscale-only, token-authed single-tool runner (scope-gated proxy to the installed bins).
+benchmark/   External-target truth sets + scopes (e.g. juiceshop).
+skills/      Detector playbooks (markdown).
+archive/     One-off debug/experiment scripts kept for reference; NOT part of any scan path.
+```
