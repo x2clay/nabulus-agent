@@ -29,6 +29,7 @@ CLASS_MAP = {
     "business-logic": "business-logic", "bulk": "bulk-user-disclosure",
     "auth": "auth-jwt", "cors": "cors-misconfig",
     "unauth-exposure": "unauth-exposure", "open-redirect": "open-redirect",
+    "authbypass": "auth-bypass", "auth-bypass": "auth-bypass",
 }
 
 

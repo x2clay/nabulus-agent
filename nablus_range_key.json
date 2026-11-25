@@ -57,6 +57,12 @@
       "locator": "/api/config",
       "contaminated": false,
       "note": "route_api_config: reflects arbitrary request Origin into Access-Control-Allow-Origin with Access-Control-Allow-Credentials:true (credentialed cross-origin read). /api/public reflects without creds = herring."
+    },
+    {
+      "vuln_class": "auth-bypass",
+      "locator": "/admin/metrics",
+      "contaminated": false,
+      "note": "route_admin_metrics: trusts client-supplied X-Forwarded-For=127.0.0.1 as internal auth -> anon reads admin content. /api/admin/export + /api/flag are gated by session/token and are NOT header-bypassable = herrings."
     }
   ]
 }

@@ -31,6 +31,7 @@ class VulnClass(str, Enum):
     BUSINESS_LOGIC = "business-logic"
     UNAUTH_EXPOSURE = "unauth-exposure"
     OPEN_REDIRECT = "open-redirect"
+    AUTH_BYPASS = "auth-bypass"
 
 
 @dataclass(frozen=True)
