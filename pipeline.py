@@ -20,7 +20,7 @@ Scope is still enforced inside each stage (runner.Scope / in_scope); this orches
 only sequences them. Target generalization (beyond the range BASE) is a follow-up.
 """
 from __future__ import annotations
-import sys, json, subprocess, argparse, pathlib
+import os, sys, json, subprocess, argparse, pathlib
 
 ROOT = pathlib.Path(__file__).resolve().parent
 
@@ -124,9 +124,20 @@ def main():
     ap.add_argument("--skip-blackbox", action="store_true")
     ap.add_argument("--anon", action="store_true",
                     help="zero-creds black-box product: anon stages only, skip authed logins")
+    ap.add_argument("--recon", action="store_true",
+                    help="run recon discovery first; widen NABLUS_SEEDS to the discovered surface")
     ap.add_argument("--out", default="nablus_report.json")
     a = ap.parse_args()
 
+    if a.recon:
+        recon = run_stage("recon discovery", ["recon_harness.py"], "recon_targets.json")
+        seeds = recon.get("seeds", "") if isinstance(recon, dict) else ""
+        if seeds:
+            existing = os.environ.get("NABLUS_SEEDS", "").strip()
+            os.environ["NABLUS_SEEDS"] = (existing + "," + seeds).strip(",") if existing else seeds
+            print(f"[pipeline] recon widened NABLUS_SEEDS to {len(os.environ['NABLUS_SEEDS'].split(','))} path(s)")
+        else:
+            print("[pipeline] recon produced no seeds; stages run on NABLUS_TARGET only")
     idor = sqli = xss = bac = bizlogic = openredir = unauth = cors = authbypass = ssrf = nuclei = []
     if not a.skip_blackbox:
         if not a.anon:        # authed stages need a login; --anon = zero-creds product
