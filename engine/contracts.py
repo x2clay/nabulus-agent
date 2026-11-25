@@ -29,6 +29,8 @@ class VulnClass(str, Enum):
     CSRF = "csrf"
     INJECTION = "injection"
     BUSINESS_LOGIC = "business-logic"
+    UNAUTH_EXPOSURE = "unauth-exposure"
+    OPEN_REDIRECT = "open-redirect"
 
 
 @dataclass(frozen=True)

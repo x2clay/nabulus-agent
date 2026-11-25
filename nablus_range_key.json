@@ -9,6 +9,8 @@
     {"vuln_class": "injection", "locator": "/api/status", "contaminated": false, "note": "route_api_status: uid param string-formatted into SQL (anon)"},
     {"vuln_class": "xss-reflected", "locator": "/search", "contaminated": false, "note": "q param reflected unescaped"},
     {"vuln_class": "business-logic", "locator": "/api/checkout", "contaminated": false, "note": "credit UPDATE business-logic flaw"},
-    {"vuln_class": "bulk-user-disclosure", "locator": "/api/admin/export", "contaminated": false, "note": "dumps password_hash + api_token"}
+    {"vuln_class": "bulk-user-disclosure", "locator": "/api/admin/export", "contaminated": false, "note": "dumps password_hash + api_token"},
+    {"vuln_class": "unauth-exposure", "locator": "/.env", "contaminated": false, "note": "route_env: deploy dotfile served anon, leaks SECRET_KEY + AWS creds"},
+    {"vuln_class": "unauth-exposure", "locator": "/backup.sql", "contaminated": false, "note": "route_backup_sql: db dump served anon"}
   ]
 }

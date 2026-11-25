@@ -28,6 +28,7 @@ CLASS_MAP = {
     "xss": "xss-reflected", "ssrf": "ssrf", "cmdi": "injection",
     "business-logic": "business-logic", "bulk": "bulk-user-disclosure",
     "auth": "auth-jwt", "cors": "cors-misconfig",
+    "unauth-exposure": "unauth-exposure", "open-redirect": "open-redirect",
 }
 
 
