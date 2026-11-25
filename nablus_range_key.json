@@ -63,6 +63,12 @@
       "locator": "/admin/metrics",
       "contaminated": false,
       "note": "route_admin_metrics: trusts client-supplied X-Forwarded-For=127.0.0.1 as internal auth -> anon reads admin content. /api/admin/export + /api/flag are gated by session/token and are NOT header-bypassable = herrings."
+    },
+    {
+      "vuln_class": "ssrf",
+      "locator": "/api/fetch",
+      "contaminated": false,
+      "note": "route_api_fetch: urlopen() of a client-supplied url with no allowlist/scheme/host guard -> server-side request forgery, OOB-provable. /api/preview takes `url` but allowlists host=cdn.northwind.local and refuses others with NO outbound request = herring (no OOB callback -> not flagged)."
     }
   ]
 }
