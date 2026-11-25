@@ -14,7 +14,9 @@ Safety / doctrine:
   * --batch (no prompts), --flush-session (clean each run), bounded technique set.
   * Egress is the box's (Mullvad) exit; for real engagements allowlist that IP with the client.
 
-Query (GET) params are tested from the URL; a POST body can be supplied with --data.
+Query (GET) params are tested from the URL; a POST body can be supplied with --data. An authed
+session cookie can be supplied with --cookie (passed to sqlmap --cookie) so injection points that
+live behind login (the common case for real object APIs) are reachable.
 """
 from __future__ import annotations
 import sys, os, re, json, argparse, pathlib, subprocess, urllib.parse
@@ -31,13 +33,15 @@ _TYPE = re.compile(r"^\s*Type:\s*(?P<t>.+)$", re.M)
 _TITLE = re.compile(r"^\s*Title:\s*(?P<t>.+)$", re.M)
 
 
-def run_sqlmap(target, data, level, risk, technique, timeout, python_exe):
+def run_sqlmap(target, data, level, risk, technique, timeout, python_exe, cookie=""):
     args = [python_exe, SQLMAP, "-u", target, "--batch", "--flush-session",
             f"--level={level}", f"--risk={risk}", f"--technique={technique}",
             "--disable-coloring", "--answers=crack=N,dict=N",
             "--threads=2", "--timeout=15", "--retries=1"]
     if data:
         args += ["--data", data]
+    if cookie:
+        args += ["--cookie", cookie]
     try:
         p = subprocess.run(args, capture_output=True, text=True, timeout=timeout,
                            env={**os.environ, "PYTHONIOENCODING": "utf-8"})
@@ -65,13 +69,13 @@ def parse_points(out):
     return points
 
 
-def probe(target, data, assets, level, risk, technique, timeout, python_exe):
+def probe(target, data, assets, level, risk, technique, timeout, python_exe, cookie=""):
     host = urllib.parse.urlparse(target).hostname
     if host and not in_scope(assets, host):
         print(f"REFUSED: {host} not in scope")
         return []
     print(f"[sqli] sqlmap level={level} risk={risk} technique={technique} -> {target}")
-    out = run_sqlmap(target, data, level, risk, technique, timeout, python_exe)
+    out = run_sqlmap(target, data, level, risk, technique, timeout, python_exe, cookie)
     points = parse_points(out)
     findings = []
     for pt in points:
@@ -93,6 +97,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--target", required=True, help="URL incl. query string to test")
     ap.add_argument("--data", default=None, help="POST body (tests its params instead/also)")
+    ap.add_argument("--cookie", default="", help="session cookie string for authed endpoints")
     ap.add_argument("--scope", default="benchmark/scope_bench.json")
     ap.add_argument("--out", default="sqli_findings.json")
     ap.add_argument("--level", type=int, default=2)
@@ -102,7 +107,7 @@ def main():
     ap.add_argument("--python", default=sys.executable)
     a = ap.parse_args()
     scope = Scope(json.loads(pathlib.Path(a.scope).read_text()))
-    f = probe(a.target, a.data, scope.assets, a.level, a.risk, a.technique, a.timeout, a.python)
+    f = probe(a.target, a.data, scope.assets, a.level, a.risk, a.technique, a.timeout, a.python, a.cookie)
     pathlib.Path(a.out).write_text(json.dumps(f, indent=2))
     print(f"[sqli] {len(f)} confirmed SQLi finding(s) -> {a.out}")
     return 0
