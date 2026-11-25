@@ -16,7 +16,8 @@ import sys, re, json, time, http.cookiejar, urllib.request, urllib.parse, urllib
 from urllib.parse import urljoin, urlparse, parse_qsl, urlencode
 from html.parser import HTMLParser
 
-BASE = "http://127.0.0.1:8099"
+import os
+BASE = os.environ.get("NABLUS_TARGET", "http://127.0.0.1:8099").rstrip("/")
 CREDS = {"alice": "Sunflower#A1pha"}
 OUT = r"C:\Users\Laith\nabulus-agent\bac_findings.json"
 PACE = 0.02

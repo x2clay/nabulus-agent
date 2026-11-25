@@ -15,7 +15,11 @@ from urllib.parse import urljoin, urlparse, urlencode, parse_qsl
 from html.parser import HTMLParser
 from playwright.sync_api import sync_playwright
 
-BASE = "http://127.0.0.1:8099"
+import os
+BASE = os.environ.get("NABLUS_TARGET", "http://127.0.0.1:8099").rstrip("/")
+# NABLUS_SEEDS: comma-separated "url?param" entries to force into the candidate set,
+# for JS/RSC apps a blind HTML crawl can't discover (e.g. /login/?next=, /search?q=).
+SEEDS = [s.strip() for s in os.environ.get("NABLUS_SEEDS", "").split(",") if s.strip()]
 CREDS = {"alice": "Sunflower#A1pha"}
 OUT = r"C:\Users\Laith\nabulus-agent\xss_findings.json"
 PACE = 0.02
@@ -100,6 +104,17 @@ def candidates(cookie):
     for stem in stems | {BASE + "/search", BASE + "/"}:
         for pn in PARAM_NAMES:
             cands.add((stem, pn))
+    # explicit seeds (known param endpoints an RSC/SPA crawl can't find)
+    for s in SEEDS:
+        pr = urlparse(s if "://" in s else BASE + ("" if s.startswith("/") else "/") + s)
+        base = f"{pr.scheme}://{pr.netloc}{pr.path}"
+        qs = parse_qsl(pr.query)
+        if qs:
+            for k, _v in qs:
+                cands.add((base, k))
+        else:
+            for pn in PARAM_NAMES:
+                cands.add((base, pn))
     return sorted(cands)
 
 

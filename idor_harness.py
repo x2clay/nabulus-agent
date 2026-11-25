@@ -15,7 +15,8 @@ from urllib.parse import urljoin, urlparse, parse_qsl, urlencode
 from html.parser import HTMLParser
 import idor
 
-BASE = "http://127.0.0.1:8099"
+import os
+BASE = os.environ.get("NABLUS_TARGET", "http://127.0.0.1:8099").rstrip("/")
 CREDS = {"alice": "Sunflower#A1pha", "bob": "Mountain#B2eta"}
 OUT = r"C:\Users\Laith\nabulus-agent\idor_findings.json"
 

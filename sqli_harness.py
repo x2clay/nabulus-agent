@@ -25,7 +25,8 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import sqli_probe
 from runner import Scope
 
-BASE = "http://127.0.0.1:8099"
+import os
+BASE = os.environ.get("NABLUS_TARGET", "http://127.0.0.1:8099").rstrip("/")
 CREDS = {"alice": "Sunflower#A1pha"}
 OUT = r"C:\Users\Laith\nabulus-agent\sqli_findings.json"
 SCOPE = "scope_range.json"
