@@ -21,7 +21,7 @@ from html.parser import HTMLParser
 BASE = os.environ.get("NABLUS_TARGET", "http://127.0.0.1:8099").rstrip("/")
 OUT = r"C:\Users\Laith\nabulus-agent\jwt_findings.json"
 SEEDS = [s.strip() for s in os.environ.get("NABLUS_SEEDS", "").split(",") if s.strip()]
-PACE = 0.02
+PACE = float(os.environ.get("NABLUS_PACE", "0.02"))
 
 _JWT = re.compile(r"eyJ[A-Za-z0-9_-]{6,}\.eyJ[A-Za-z0-9_-]{4,}\.[A-Za-z0-9_-]{6,}")
 _ALG = {"HS256": hashlib.sha256, "HS384": hashlib.sha384, "HS512": hashlib.sha512}

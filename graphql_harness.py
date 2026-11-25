@@ -19,7 +19,7 @@ from urllib.parse import urlparse
 BASE = os.environ.get("NABLUS_TARGET", "http://127.0.0.1:8099").rstrip("/")
 OUT = r"C:\Users\Laith\nabulus-agent\graphql_findings.json"
 SEEDS = [s.strip() for s in os.environ.get("NABLUS_SEEDS", "").split(",") if s.strip()]
-PACE = 0.03
+PACE = float(os.environ.get("NABLUS_PACE", "0.03"))
 
 GQL_PATHS = ["/graphql", "/api/graphql", "/v1/graphql", "/graphql/v1", "/query", "/gql", "/api/gql",
              "/graphql/console", "/index.php?graphql", "/api", "/graphql-api"]

@@ -21,7 +21,7 @@ from html.parser import HTMLParser
 BASE = os.environ.get("NABLUS_TARGET", "http://127.0.0.1:8099").rstrip("/")
 OUT = r"C:\Users\Laith\nabulus-agent\pathtraversal_findings.json"
 SEEDS = [s.strip() for s in os.environ.get("NABLUS_SEEDS", "").split(",") if s.strip()]
-PACE = 0.02
+PACE = float(os.environ.get("NABLUS_PACE", "0.02"))
 
 LFI_PARAMS = ["file", "path", "page", "filename", "filepath", "name", "doc", "document", "download",
               "dir", "folder", "template", "view", "include", "inc", "load", "read", "src", "img",

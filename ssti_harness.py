@@ -22,7 +22,7 @@ from html.parser import HTMLParser
 BASE = os.environ.get("NABLUS_TARGET", "http://127.0.0.1:8099").rstrip("/")
 OUT = r"C:\Users\Laith\nabulus-agent\ssti_findings.json"
 SEEDS = [s.strip() for s in os.environ.get("NABLUS_SEEDS", "").split(",") if s.strip()]
-PACE = 0.02
+PACE = float(os.environ.get("NABLUS_PACE", "0.02"))
 
 # engine delimiter wrappers; EXPR is replaced by the arithmetic expression string
 WRAPPERS = [

@@ -30,7 +30,7 @@ ITSH_CLIENT = os.environ.get("NABLUS_ITSH_CLIENT",
                              r"C:\Users\Laith\nabulus-tools\bin\interactsh-client.exe")
 ITSH_SERVER = os.environ.get("NABLUS_ITSH_SERVER") or None
 WORKDIR = os.path.dirname(os.path.abspath(__file__))
-PACE = 0.02
+PACE = float(os.environ.get("NABLUS_PACE", "0.02"))
 POLL_WAIT = 14.0
 
 # endpoints that commonly accept an XML / SOAP body server-side
