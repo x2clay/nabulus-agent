@@ -1,0 +1,87 @@
+# ============================================================
+# Nablus pentest engine — .gitignore
+# Policy: ENGINE CODE ONLY. No credentials, no session state,
+# no scan output, no findings on real targets. Private repo.
+# ============================================================
+
+# ---- credentials / session state (NEVER commit) ----
+.cortisol_profile/
+SESSIONS/
+*.storage.json
+*.storage.json.*
+local.env
+*.env
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+secrets*.json
+token*.json
+*_token*.json
+accounts.json
+
+# ---- target-specific one-off scripts & data (keep the reusable engine) ----
+cortisol_*
+quantnq_*
+qnq_*
+papers_*
+next_*
+master_seed.json
+
+# ---- scan outputs / findings / run artifacts (regenerable, may hold target data) ----
+raw/
+*.log
+*.err
+*.out
+*.jsonl
+*findings*.json
+*_findings.json
+*_report.md
+*_scorecard.md
+*proposed*.json
+*_prop.json
+*_authz*.json
+*authz*.json
+*_oos.json
+*_ssrf_*.json
+*_xss_*.json
+*_redir_*.json
+*endpoints*.json
+*_result.json
+*_run.json
+_run.json
+notebook.json
+authz_report.md
+oob_hits.jsonl
+itsh*.jsonl
+
+# ---- backups / caches / build junk ----
+*.bak
+*.bak-*
+*.bak*
+__pycache__/
+*.pyc
+*.pyo
+*.spare.pma
+*.pma
+
+# ---- keep: example configs, benchmark fixtures/keys, docs ----
+# (explicitly un-ignored so the denylist above can't swallow them)
+!accounts.example.json
+!*.example.json
+!engine/bench/fixtures/*_key.json
+!engine/bench/fixtures/demo_findings.json
+!benchmark/juiceshop_truth.json
+!benchmark/scope_bench.json
+scope.json
+scope_cortisol.json
+run_cortisol.ps1
+run_quantnq.ps1
+run_quantnq_access.ps1
+run_papers.ps1
+run_next.ps1
+auth_flow.py
+auth_flow2.py
+auth_flow3.py

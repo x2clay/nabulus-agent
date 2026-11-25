@@ -1,0 +1,11 @@
+; 14B coder fits the 16 GB 5060 Ti. threads=4 avoids the 20-core spin-wait that tanked tok/s.
+[qwen2.5-coder-14b-instruct]
+ctx-size = 16384
+cache-type-k = q8_0
+cache-type-v = q8_0
+parallel = 1
+threads = 4
+threads-batch = 4
+n-gpu-layers = 99
+device = CUDA0
+flash-attn = on

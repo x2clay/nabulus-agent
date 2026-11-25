@@ -1,0 +1,23 @@
+{
+  "app": "OWASP Juice Shop",
+  "class": "unauthenticated sensitive-file / access-control exposure (the subset authz_probe detects today)",
+  "note": "Labels are approximate across Juice Shop versions; benchmark.py lists any extra flags as needs-review so you can correct these.",
+  "should_flag": [
+    {"path": "/ftp/acquisitions.md", "why": "Confidential Document challenge - sensitive file reachable by anon"},
+    {"path": "/ftp/announcement_encrypted.md", "why": "sensitive file served to anon"},
+    {"path": "/ftp/incident-support.kdbx", "why": "KeePass DB exposed to anon"},
+    {"path": "/encryptionkeys/premium.key", "why": "premium key material exposed (51-byte octet-stream)"},
+    {"path": "/encryptionkeys/jwt.pub", "why": "key material reachable"}
+  ],
+  "should_not_flag": [
+    "/",
+    "/#/administration",
+    "/profile",
+    "/ftp/coupons_2013.md.bak",
+    "/ftp/package.json.bak",
+    "/ftp/suspicious_errors.yml"
+  ],
+  "verified_blocked_on_direct_get": {
+    "/ftp/suspicious_errors.yml": "403 - extension allowlist; only reachable via poison-null-byte bypass (separate technique, not plain GET)"
+  }
+}

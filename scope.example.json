@@ -1,0 +1,11 @@
+{
+  "program": "example authorized engagement",
+  "authorization_ref": "REQUIRED: written authorization reference (engagement ID, operator-owned attestation, bug-bounty program URL). The engine refuses any host not listed in authorized_assets.",
+  "asset_type": "api",
+  "authorized_assets": [
+    "127.0.0.1:8099",
+    "example.com"
+  ],
+  "rate_limit_rps": 2,
+  "exclusions": []
+}

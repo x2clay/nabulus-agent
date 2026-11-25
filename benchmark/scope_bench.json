@@ -1,0 +1,8 @@
+{
+  "program": "LOCAL BENCHMARK - OWASP Juice Shop (self-hosted calibration target)",
+  "authorization_ref": "Intentionally-vulnerable app run locally on 127.0.0.1 for tool calibration; self-hosted and self-authorized.",
+  "asset_type": "infra",
+  "authorized_assets": ["127.0.0.1", "localhost"],
+  "rate_limit_rps": 10,
+  "exclusions": []
+}

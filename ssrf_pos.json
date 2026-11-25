@@ -1,0 +1,19 @@
+[
+  {
+    "class": "ssrf",
+    "severity": "high",
+    "endpoint": "http://127.0.0.1:8188/fetch",
+    "param": "url",
+    "proof_request": "GET http://127.0.0.1:8188/fetch?url=http%3A%2F%2F127.0.0.1%3A9099%2F17a447420a84",
+    "proof_callback": {
+      "ts": "2026-11-23T11:10:14.542672+00:00",
+      "path": "/17a447420a84",
+      "client": "127.0.0.1",
+      "ua": "Python-urllib/3.11",
+      "method": "GET"
+    },
+    "validated_by": "out-of-band callback (target server fetched our listener)",
+    "confirmed": true,
+    "note": "PROOF of SSRF only - internal/metadata impact is human-gated"
+  }
+]

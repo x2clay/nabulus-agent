@@ -1,0 +1,14 @@
+{
+  "target": "testasp.vulnweb.com",
+  "base_url": "http://testasp.vulnweb.com",
+  "contaminated": true,
+  "note": "Acunetix acuforum public test site (classic ASP). Heavily documented => grades known-vuln competence, NOT discovery. Key from public ground truth, independent of any scanner's checks.",
+  "expected": [
+    {"vuln_class": "injection", "locator": "/showforum.asp?id", "note": "SQLi in id param"},
+    {"vuln_class": "injection", "locator": "/showthread.asp?id", "note": "SQLi in id param"},
+    {"vuln_class": "injection", "locator": "/login.asp", "note": "login SQLi auth bypass"},
+    {"vuln_class": "xss-reflected", "locator": "/search.asp", "note": "reflected XSS in search box"},
+    {"vuln_class": "xss-stored", "locator": "/comment.asp", "note": "stored XSS in forum comment"},
+    {"vuln_class": "csrf", "locator": "/comment.asp", "note": "state-changing form, no anti-CSRF token"}
+  ]
+}

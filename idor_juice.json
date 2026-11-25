@@ -1,0 +1,15 @@
+[
+  {
+    "class": "idor-bola",
+    "severity": "high",
+    "object": "basket",
+    "endpoint": "http://127.0.0.1:3000/rest/basket/{id}",
+    "accessed_id": 6,
+    "requester_user_id": 27,
+    "object_owner_user_id": 26,
+    "proof_request": "GET http://127.0.0.1:3000/rest/basket/6  (Authorization: Bearer <userB>)",
+    "validated_by": "cross-identity differential: user B read user A's object (owner id != requester id)",
+    "confirmed": true,
+    "note": "Read-only proof of BOLA. Write/delete IDOR is a proposed check, not auto-run."
+  }
+]

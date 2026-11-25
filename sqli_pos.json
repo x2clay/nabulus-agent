@@ -1,0 +1,22 @@
+[
+  {
+    "class": "sqli",
+    "severity": "critical",
+    "endpoint": "http://127.0.0.1:8099/item?id=1",
+    "parameter": "id",
+    "place": "GET",
+    "injection_types": [
+      "boolean-based blind",
+      "error-based",
+      "time-based blind"
+    ],
+    "proof_titles": [
+      "AND boolean-based blind - WHERE or HAVING clause",
+      "SQLite >= 3.9 AND error-based - WHERE, HAVING, ORDER BY or GROUP BY clause (JSON path)",
+      "SQLite > 2.0 AND time-based blind (heavy query)"
+    ],
+    "validated_by": "sqlmap confirmed injection point (differential/time/error proof)",
+    "confirmed": true,
+    "note": "Detection only - no data dumped. Exploitation/impact is human-gated."
+  }
+]

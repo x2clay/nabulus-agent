@@ -1,0 +1,18 @@
+# OWASP Juice Shop probe seeds - mix of real sensitive files, blocked files, SPA shells, APIs.
+# Used by benchmark.py to score authz_probe's unauth file-exposure detection.
+/ftp/acquisitions.md
+/ftp/announcement_encrypted.md
+/ftp/incident-support.kdbx
+/ftp/suspicious_errors.yml
+/ftp/legal.md
+/ftp/coupons_2013.md.bak
+/ftp/package.json.bak
+/encryptionkeys/
+/encryptionkeys/premium.key
+/encryptionkeys/jwt.pub
+/
+/#/administration
+/profile
+/rest/products/search
+/api/Users
+/robots.txt

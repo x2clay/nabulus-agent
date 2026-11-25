@@ -1,0 +1,9 @@
+{
+  "updated": "2026-11-24T22:45:32.142835+00:00",
+  "cycle": 1,
+  "hours_left": 2.87,
+  "leads_this_cycle": 4,
+  "proved_this_cycle": 0,
+  "deepseek": true,
+  "model": "qwen2.5-coder-14b-instruct"
+}

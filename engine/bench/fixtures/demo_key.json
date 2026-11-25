@@ -1,0 +1,10 @@
+{
+  "target": "demo.local",
+  "base_url": "http://demo.local",
+  "contaminated": true,
+  "expected": [
+    {"vuln_class": "idor-enumeration", "locator": "/api/users/{id}", "contaminated": true},
+    {"vuln_class": "xss-stored", "locator": "/profile/bio", "contaminated": true},
+    {"vuln_class": "business-logic", "locator": "/api/wallet/transfer", "contaminated": false, "note": "post-cutoff clean target"}
+  ]
+}

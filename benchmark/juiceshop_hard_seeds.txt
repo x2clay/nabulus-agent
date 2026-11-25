@@ -1,0 +1,25 @@
+# HARDER unauthenticated endpoints for OWASP Juice Shop - tests the system's discovery + oracle
+# on API/data/infra exposures, not just static files. Mix of real unauth leaks and should-be-401.
+/rest/admin/application-configuration
+/rest/admin/application-version
+/rest/products/search
+/api/Challenges
+/api/Feedbacks
+/api/Quantitys
+/api/Users
+/rest/user/whoami
+/rest/user/authentication-details
+/metrics
+/snippets
+/.well-known/security.txt
+/support/logs
+/support/logs/
+/ftp/quarantine/
+/ftp/
+/encryptionkeys/
+/b2b/v2/orders
+/rest/memories
+/redirect
+/dataerasure
+/profile
+/assets/public/

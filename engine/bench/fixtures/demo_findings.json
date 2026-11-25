@@ -1,0 +1,7 @@
+{
+  "demo.local": [
+    {"vuln_class": "idor-enumeration", "severity": "high", "endpoint": "/api/users/{id}", "summary": "cross-user read"},
+    {"vuln_class": "xss-stored", "severity": "high", "endpoint": "/profile/bio", "summary": "stored payload"},
+    {"vuln_class": "cors-misconfig", "severity": "low", "endpoint": "/api/config", "summary": "spurious"}
+  ]
+}

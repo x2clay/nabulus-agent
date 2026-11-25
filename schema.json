@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "nabulus-agent assessment result",
+  "type": "object",
+  "required": ["target", "timestamp", "asset_type", "surface", "findings"],
+  "properties": {
+    "target":     { "type": "string", "description": "Authorized asset this result pertains to" },
+    "timestamp":  { "type": "string", "format": "date-time" },
+    "asset_type": { "type": "string", "enum": ["exchange", "wallet", "api", "infra"] },
+    "program":    { "type": "string", "description": "Engagement / program the scope authorizes" },
+    "authorization_ref": { "type": "string", "description": "Reference proving authorization for this target" },
+    "surface": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["kind", "value"],
+        "properties": {
+          "kind":  { "type": "string", "enum": ["subdomain", "url", "port", "param", "js", "endpoint"] },
+          "value": { "type": "string" },
+          "in_scope": { "type": "boolean", "description": "false = discovered but NOT actively scanned" }
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "severity", "tool", "evidence", "raw_path", "confirmed"],
+        "properties": {
+          "type":     { "type": "string", "enum": ["info", "misconfig", "vuln", "exposure", "api"] },
+          "severity": { "type": "string", "enum": ["info", "low", "med", "high", "crit"] },
+          "tool":     { "type": "string" },
+          "evidence": { "type": "string" },
+          "raw_path": { "type": "string", "description": "Path to raw tool output for audit/replay" },
+          "confirmed":{ "type": "boolean", "default": false }
+        }
+      }
+    }
+  }
+}
